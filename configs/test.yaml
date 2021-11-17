@@ -1,0 +1,12 @@
+regions_of_interest: [ "../dat/2018-06-13/region_1/selected_region.xlsx",
+                       "../dat/2018-06-13/region_2/selected_region.xlsx"]
+ecm_image_directories: [ "../dat/2018-06-13/region_1/C002",
+                         "../dat/2018-06-13/region_2/C002" ]
+cell_image_directories: [ "../dat/2018-06-13/region_1/C001",
+                          "../dat/2018-06-13/region_2/C001" ]
+image_spacing: [ [ 1.0, 1.0, 1.0 ],
+                 [ 1.0, 1.0, 1.0 ] ]
+bilateral_domain_sigma: 0.5
+bilateral_range_sigma: 5.0
+equalization_window: [ 0.5, 0.5 ]
+exponent: 1.1
