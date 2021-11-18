@@ -2,3 +2,7 @@
 *.vtp
 *.tif
 *.pyc
+*.xlsx
+*.txt
+Thumbs.db
+.idea
