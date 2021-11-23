@@ -1,7 +1,7 @@
 import sys
+import pyCellAnalyst as pycell
 sys.path.append("..")
 from pcm_segmenter import config, segment, io
-import pyCellAnalyst as pycell
 
 c = config.parse_config(configuration_file="../configs/test.yaml")
 

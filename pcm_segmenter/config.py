@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List
 import yaml
 
+
 class Config(BaseModel):
     regions_of_interest: List[str]
     ecm_image_directories: List[str]
@@ -14,10 +15,10 @@ class Config(BaseModel):
     exponent: float = 1.1
     diffusion_conductance: float = 9.0
     diffusion_iterations: float = 20
+    surface_angles: List[float]
 
 
 def parse_config(configuration_file: str = "") -> Config:
     with open(os.path.abspath(configuration_file), "r") as f:
         data = yaml.load(f, Loader=yaml.SafeLoader)
     return Config(**data)
-
