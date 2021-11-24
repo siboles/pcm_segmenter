@@ -10,3 +10,4 @@ bilateral_domain_sigma: 0.5
 bilateral_range_sigma: 5.0
 equalization_window: [ 0.5, 0.5 ]
 exponent: 1.1
+surface_angles: [0.0, 0.0]
