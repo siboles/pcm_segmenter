@@ -20,9 +20,9 @@ def read_image_stack(directory: str, spacing: List[float]) -> pycell.FloatImage:
     return pycell.FloatImage(directory, spacing=spacing)
 
 
-def write_isocontour(isocontour: vtk.vtkPolyData, name: str):
+def write_polydata(isocontour: vtk.vtkPolyData, name: str):
     filepath = BASE_DIRECTORY.joinpath(f"{name}.vtp")
-    print(f"... Saving isocontour to {filepath}")
+    print(f"... Saving polydata to {filepath}")
     writer = vtk.vtkXMLPolyDataWriter()
     writer.SetFileName(str(filepath))
     writer.SetInputData(isocontour)
@@ -31,4 +31,5 @@ def write_isocontour(isocontour: vtk.vtkPolyData, name: str):
 
 def write_results_to_excel(dataframe: pandas.DataFrame, name: str):
     filepath = BASE_DIRECTORY.joinpath(f"{name}.xlsx")
+    print(f"... Saving data to {filepath}")
     dataframe.to_excel(filepath)

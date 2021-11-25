@@ -201,7 +201,7 @@ def calculate_thicknesses(cell_isocontour: vtk.vtkPolyData, ecm_isocontour: vtk.
     return thickness_polydatas
 
 
-def create_pandas_dataframe(polydata: vtk.vtkPolyData) -> pandas.DataFrame:
+def create_pandas_dataframe(polydata: vtk.vtkPolyData, cell_id: int) -> pandas.DataFrame:
     dataframe = pandas.DataFrame()
     for array_id in range(polydata.GetPointData().GetNumberOfArrays()):
         array = polydata.GetPointData().GetArray(array_id)
@@ -209,5 +209,8 @@ def create_pandas_dataframe(polydata: vtk.vtkPolyData) -> pandas.DataFrame:
             column_name = array.GetName()
             data = numpy_support.vtk_to_numpy(polydata.GetPointData().GetArray(array_id))
             dataframe[column_name] = data
+    dataframe.insert(loc=0, column="Cell", value=np.ones(data.size) * cell_id)
     return dataframe
+
+
 
