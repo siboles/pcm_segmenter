@@ -1,8 +1,19 @@
 from typing import List
+import pathlib
 import vtk
 import pyCellAnalyst as pycell
-import pandas as pds
+import pandas
 from . import config
+
+BASE_DIRECTORY = pathlib.Path(".")
+
+
+def set_base_directory(directory: str):
+    global BASE_DIRECTORY
+    directory = pathlib.Path(directory)
+    if not directory.exists():
+        directory.mkdir()
+    BASE_DIRECTORY = directory
 
 
 def read_image_stack(directory: str, spacing: List[float]) -> pycell.FloatImage:
@@ -10,12 +21,14 @@ def read_image_stack(directory: str, spacing: List[float]) -> pycell.FloatImage:
 
 
 def write_isocontour(isocontour: vtk.vtkPolyData, name: str):
-    print(f"... Saving isocontour to {name}.vtp")
+    filepath = BASE_DIRECTORY.joinpath(f"{name}.vtp")
+    print(f"... Saving isocontour to {filepath}")
     writer = vtk.vtkXMLPolyDataWriter()
-    writer.SetFileName(f"{name}.vtp")
+    writer.SetFileName(str(filepath))
     writer.SetInputData(isocontour)
     writer.Write()
 
 
-def write_thicknesses_to_excel(thicknesses: pds.DataFrame):
-    pass
+def write_results_to_excel(dataframe: pandas.DataFrame, name: str):
+    filepath = BASE_DIRECTORY.joinpath(f"{name}.xlsx")
+    dataframe.to_excel(filepath)

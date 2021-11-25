@@ -1,6 +1,7 @@
 from typing import List, Tuple
 
 import numpy as np
+import pandas
 import vtk
 from vtk.util import numpy_support
 
@@ -121,7 +122,8 @@ def _initialize_int_array(number_of_tuples: int, number_of_components: int, name
 
 
 def _make_thickness_polydata(coordinates: vtk.vtkFloatArray, thicknesses: vtk.vtkFloatArray,
-                             directions: vtk.vtkFloatArray, region_ids: vtk.vtkIntArray) -> vtk.vtkPolyData:
+                             directions: vtk.vtkFloatArray, region_ids: vtk.vtkIntArray,
+                             angular_directions: vtk.vtkFloatArray) -> vtk.vtkPolyData:
     points = vtk.vtkPoints()
     points.SetData(coordinates)
     polydata = vtk.vtkPolyData()
@@ -129,6 +131,7 @@ def _make_thickness_polydata(coordinates: vtk.vtkFloatArray, thicknesses: vtk.vt
     polydata.GetPointData().AddArray(thicknesses)
     polydata.GetPointData().AddArray(directions)
     polydata.GetPointData().AddArray(region_ids)
+    polydata.GetPointData().AddArray(angular_directions)
     return polydata
 
 
@@ -164,6 +167,7 @@ def calculate_thicknesses(cell_isocontour: vtk.vtkPolyData, ecm_isocontour: vtk.
         coordinates = _initialize_float_array(number_of_points, 3, "Coordinates")
         thicknesses = _initialize_float_array(number_of_points, 1, "Thickness")
         directions = _initialize_float_array(number_of_points, 3, "Direction")
+        angular_directions = _initialize_float_array(number_of_points, 1, "Angle")
 
         region_ids = _initialize_int_array(number_of_points, 1, "Region")
 
@@ -187,8 +191,23 @@ def calculate_thicknesses(cell_isocontour: vtk.vtkPolyData, ecm_isocontour: vtk.
                 relative_to_surface_angle -= 2.0 * np.pi
             region = np.digitize([relative_to_surface_angle], region_angle_bounds)[0]
             region_ids.SetTuple1(row, region)
+            angular_directions.SetTuple1(row, np.rad2deg(relative_to_surface_angle))
 
-        thickness_polydatas.append(_make_thickness_polydata(coordinates, thicknesses, directions, region_ids))
+        thickness_polydatas.append(_make_thickness_polydata(coordinates,
+                                                            thicknesses,
+                                                            directions,
+                                                            region_ids,
+                                                            angular_directions))
     return thickness_polydatas
 
+
+def create_pandas_dataframe(polydata: vtk.vtkPolyData) -> pandas.DataFrame:
+    dataframe = pandas.DataFrame()
+    for array_id in range(polydata.GetPointData().GetNumberOfArrays()):
+        array = polydata.GetPointData().GetArray(array_id)
+        if array.GetNumberOfComponents() == 1:
+            column_name = array.GetName()
+            data = numpy_support.vtk_to_numpy(polydata.GetPointData().GetArray(array_id))
+            dataframe[column_name] = data
+    return dataframe
 
