@@ -10,6 +10,22 @@ def read_image_stack(directory: str, spacing: List[float]) -> pycell.FloatImage:
     return pycell.FloatImage(directory, spacing=spacing)
 
 
+def read_polydata(polydata: vtk.vtkPolyData, name: str, directory: str):
+    reader = vtk.vtkXMLPolyDataReader()
+    reader.SetFileName(pathlib.Path(directory).joinpath(name))
+    reader.Update()
+    return reader.GetOutput()
+
+
+def read_dataframe_from_excel(name: str, directory: str):
+    dataframe = pandas.read_excel(pathlib.Path(directory).joinpath(name))
+    return dataframe
+
+
+def write_image(image: pycell.Image, name: str, directory: str):
+    image.writeAsVTK(name=pathlib.Path(directory).joinpath(name))
+
+
 def write_polydata(isocontour: vtk.vtkPolyData, name: str, directory: str):
     filepath = pathlib.Path(directory).joinpath(f"{name}.vtp")
     print(f"... Saving polydata to {filepath}")

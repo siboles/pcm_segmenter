@@ -1,16 +1,18 @@
-import sys
+import argparse
 import datetime
-import pathlib
-from pydantic import BaseModel
 from typing import Dict
+
 import pandas
-from . import config, segment, analysis, io, postprocess
 from pyCellAnalyst import RegionsOfInterest
+from pydantic import BaseModel
+
+from . import config, segment, analysis, io
 
 
 class PipelineResult(BaseModel):
     image_level_dataframes: Dict[str, pandas.DataFrame]
     aggregated_dataframe: pandas.DataFrame
+
     class Config:
         arbitrary_types_allowed = True
 
@@ -20,11 +22,10 @@ def config_from_file(config_file: str):
 
 
 def run(c: config.Config,
-        save_image_level_thicknesses: bool=False,
-        save_aggregated_dataframes: bool=True,
-        save_contours: bool=False,
-        save_thickness_polydata: bool=False):
-
+        save_image_level_thicknesses: bool = False,
+        save_aggregated_dataframes: bool = True,
+        save_contours: bool = False,
+        save_thickness_polydata: bool = False):
     now = datetime.datetime.now()
     aggregate_filename = now.strftime('pipeline_run_%m_%d_%H_%M')
 
@@ -46,10 +47,13 @@ def run(c: config.Config,
             cell_segmentation = segment.segment_cell(cell_smooth)
 
             if save_contours:
-                io.write_polydata(ecm_segmentation.isocontour, name=f"ecm_chondron{chondron_id:02d}", directory=c.output_directories[i])
-                io.write_polydata(cell_segmentation.isocontour, name=f"cell_chondron{chondron_id:02d}", directory=c.output_directories[i])
+                io.write_polydata(ecm_segmentation.isocontour, name=f"ecm_chondron{chondron_id:02d}",
+                                  directory=c.output_directories[i])
+                io.write_polydata(cell_segmentation.isocontour, name=f"cell_chondron{chondron_id:02d}",
+                                  directory=c.output_directories[i])
 
-            thickness_polydatas = analysis.calculate_thicknesses(cell_segmentation.isocontour, ecm_segmentation.isocontour,
+            thickness_polydatas = analysis.calculate_thicknesses(cell_segmentation.isocontour,
+                                                                 ecm_segmentation.isocontour,
                                                                  c.image_spacing[i], c.surface_angles[i])
 
             for cell_id, thickness_polydata in enumerate(thickness_polydatas):
@@ -64,12 +68,32 @@ def run(c: config.Config,
         if save_image_level_thicknesses:
             io.write_results_to_excel(image_level_dataframes[c.output_directories[i]],
                                       name=f"thicknesses",
-                                      directory=c.output_directories)
+                                      directory=c.output_directories[i])
     aggregated_dataframe = analysis.concatenate_pandas_dataframes(image_level_dataframes.values())
     if save_aggregated_dataframes:
         io.write_results_to_excel(aggregated_dataframe, name=aggregate_filename, directory=".")
 
+    results = PipelineResult(image_level_dataframes=image_level_dataframes,
+                             aggregated_dataframe=aggregated_dataframe)
+    return results
+
 
 if __name__ == "__main__":
-    configuration = config_from_file(sys.argv[-1])
-    run(configuration)
+    parser = argparse.ArgumentParser(
+        description="Create a segmentation and analysis pipeline for supplied configuration file.")
+    parser.add_argument("configuration_file", type=str, nargs=1, help="Path to configuration file.")
+    parser.add_argument("--save_thicknesses", action="store_true",
+                        help="Write dataframe to excel file for each image directory")
+    parser.add_argument("--save_contours", action="store_true",
+                        help="Write polydata to disk for all PCM isocontours")
+    parser.add_argument("--save_polydata", action="store_true",
+                        help="Write polydata to disk for all PCM thickness calculations")
+
+    args = parser.parse_args()
+
+    configuration = config_from_file(args.configuration_file[0])
+
+    run(configuration,
+        save_image_level_thicknesses=args.save_thicknesses,
+        save_contours=args.save_contours,
+        save_thickness_polydata=args.save_polydata)
