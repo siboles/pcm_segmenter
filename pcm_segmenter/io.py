@@ -5,23 +5,13 @@ import pyCellAnalyst as pycell
 import pandas
 from . import config
 
-BASE_DIRECTORY = pathlib.Path(".")
-
-
-def set_base_directory(directory: str):
-    global BASE_DIRECTORY
-    directory = pathlib.Path(directory)
-    if not directory.exists():
-        directory.mkdir()
-    BASE_DIRECTORY = directory
-
 
 def read_image_stack(directory: str, spacing: List[float]) -> pycell.FloatImage:
     return pycell.FloatImage(directory, spacing=spacing)
 
 
-def write_polydata(isocontour: vtk.vtkPolyData, name: str):
-    filepath = BASE_DIRECTORY.joinpath(f"{name}.vtp")
+def write_polydata(isocontour: vtk.vtkPolyData, name: str, directory: str):
+    filepath = pathlib.Path(directory).joinpath(f"{name}.vtp")
     print(f"... Saving polydata to {filepath}")
     writer = vtk.vtkXMLPolyDataWriter()
     writer.SetFileName(str(filepath))
@@ -29,7 +19,7 @@ def write_polydata(isocontour: vtk.vtkPolyData, name: str):
     writer.Write()
 
 
-def write_results_to_excel(dataframe: pandas.DataFrame, name: str):
-    filepath = BASE_DIRECTORY.joinpath(f"{name}.xlsx")
+def write_results_to_excel(dataframe: pandas.DataFrame, name: str, directory: str):
+    filepath = pathlib.Path(directory).joinpath(f"{name}.xlsx")
     print(f"... Saving data to {filepath}")
-    dataframe.to_excel(filepath)
+    dataframe.to_excel(filepath, index=False)

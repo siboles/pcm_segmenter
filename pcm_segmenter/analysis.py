@@ -143,6 +143,7 @@ def calculate_thicknesses(cell_isocontour: vtk.vtkPolyData, ecm_isocontour: vtk.
 
     rotation_matrix = _get_rotation_matrix(surface_angle)
     region_angle_bounds = np.linspace(0.0, 2.0 * np.pi, num=5, endpoint=True) - np.pi / 4.0
+    region_labels = [0, 1, 0, 2]
 
     thickness_polydatas = []
     for cell_id, (cell, convex_hull) in enumerate(zip(cell_extrusions, cell_convex_hulls)):
@@ -190,7 +191,8 @@ def calculate_thicknesses(cell_isocontour: vtk.vtkPolyData, ecm_isocontour: vtk.
             if relative_to_surface_angle > region_angle_bounds[-1]:
                 relative_to_surface_angle -= 2.0 * np.pi
             region = np.digitize([relative_to_surface_angle], region_angle_bounds)[0]
-            region_ids.SetTuple1(row, region)
+
+            region_ids.SetTuple1(row, region_labels[region])
             angular_directions.SetTuple1(row, np.rad2deg(relative_to_surface_angle))
 
         thickness_polydatas.append(_make_thickness_polydata(coordinates,
@@ -209,8 +211,17 @@ def create_pandas_dataframe(polydata: vtk.vtkPolyData, cell_id: int) -> pandas.D
             column_name = array.GetName()
             data = numpy_support.vtk_to_numpy(polydata.GetPointData().GetArray(array_id))
             dataframe[column_name] = data
-    dataframe.insert(loc=0, column="Cell", value=np.ones(data.size) * cell_id)
+    dataframe.insert(loc=0, column="Cell", value=np.ones(data.size, dtype=int) * cell_id)
     return dataframe
 
+
+def concatenate_pandas_dataframes(dataframes: List[pandas.DataFrame]):
+    max_cell_id = 0
+    new_dataframe = pandas.DataFrame()
+    for dataframe in dataframes:
+        dataframe["Cell"] += max_cell_id
+        new_dataframe = pandas.concat([new_dataframe, dataframe])
+        max_cell_id = new_dataframe["Cell"].max() + 1
+    return new_dataframe
 
 
