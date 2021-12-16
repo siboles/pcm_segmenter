@@ -1,12 +1,12 @@
 import argparse
 import datetime
-from typing import Dict
+from typing import Dict, Optional
 
 import pandas
 from pyCellAnalyst import RegionsOfInterest
 from pydantic import BaseModel
 
-from . import config, segment, analysis, io
+from . import config, segment, analysis, io, postprocess
 
 
 class PipelineResult(BaseModel):
@@ -25,9 +25,13 @@ def run(c: config.Config,
         save_image_level_thicknesses: bool = False,
         save_aggregated_dataframes: bool = True,
         save_contours: bool = False,
-        save_thickness_polydata: bool = False):
-    now = datetime.datetime.now()
-    aggregate_filename = now.strftime('pipeline_run_%m_%d_%H_%M')
+        save_thickness_polydata: bool = False,
+        aggregate_filename: Optional[str] = None):
+    if aggregate_filename:
+        aggregate_filename = f"pipeline_{aggregate_filename}"
+    else:
+        now = datetime.datetime.now()
+        aggregate_filename = now.strftime('pipeline_run_%m_%d_%H_%M')
 
     image_level_dataframes = {}
     for i, ecm_image_directory in enumerate(c.ecm_image_directories):
@@ -61,15 +65,17 @@ def run(c: config.Config,
                     io.write_polydata(thickness_polydata,
                                       name=f"thickness_chondron{chondron_id:02d}_cell{cell_id}",
                                       directory=c.output_directories[i])
-                image_level_dataframe.append(analysis.create_pandas_dataframe(thickness_polydata,
-                                                                              cell_id=cell_id + total_cell_count))
+                image_level_dataframe.append(
+                    postprocess.create_pandas_dataframe_from_polydata(thickness_polydata,
+                                                                      cell_id=cell_id + total_cell_count))
 
-        image_level_dataframes[c.output_directories[i]] = analysis.concatenate_pandas_dataframes(image_level_dataframe)
+        image_level_dataframes[c.output_directories[i]] = postprocess.concatenate_pandas_dataframes(
+            image_level_dataframe)
         if save_image_level_thicknesses:
             io.write_results_to_excel(image_level_dataframes[c.output_directories[i]],
                                       name=f"thicknesses",
                                       directory=c.output_directories[i])
-    aggregated_dataframe = analysis.concatenate_pandas_dataframes(image_level_dataframes.values())
+    aggregated_dataframe = postprocess.concatenate_pandas_dataframes(image_level_dataframes.values())
     if save_aggregated_dataframes:
         io.write_results_to_excel(aggregated_dataframe, name=aggregate_filename, directory=".")
 
@@ -82,6 +88,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Create a segmentation and analysis pipeline for supplied configuration file.")
     parser.add_argument("configuration_file", type=str, nargs=1, help="Path to configuration file.")
+    parser.add_argument("--aggregate_filename", type=str, nargs=1, default=None, help="Filename for aggregate data.")
     parser.add_argument("--save_thicknesses", action="store_true",
                         help="Write dataframe to excel file for each image directory")
     parser.add_argument("--save_contours", action="store_true",
@@ -94,6 +101,7 @@ if __name__ == "__main__":
     configuration = config_from_file(args.configuration_file[0])
 
     run(configuration,
+        aggregate_filename=args.aggregate_filename[0],
         save_image_level_thicknesses=args.save_thicknesses,
         save_contours=args.save_contours,
         save_thickness_polydata=args.save_polydata)

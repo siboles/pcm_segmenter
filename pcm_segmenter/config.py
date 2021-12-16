@@ -15,7 +15,7 @@ class Config(BaseModel):
     equalization_window: List[float] = (0.5, 0.5)
     exponent: float = 1.1
     diffusion_conductance: float = 9.0
-    diffusion_iterations: float = 20
+    diffusion_iterations: int = 20
     surface_angles: List[float]
 
 

@@ -1,0 +1,52 @@
+regions_of_interest: [ "../dat/2018-10-04/region_1/selected_region.xlsx",
+                       "../dat/2018-10-04/region_2/selected_region.xlsx",
+                       "../dat/2018-10-04/region_3/selected_region.xlsx",
+                       "../dat/2018-10-04/region_4/selected_region.xlsx",
+                       "../dat/2018-10-04/region_5/selected_region.xlsx",
+                       "../dat/2018-10-04/region_6/selected_region.xlsx",
+                       "../dat/2018-10-04/region_7/selected_region.xlsx",
+                       "../dat/2018-10-04/region_8/selected_region.xlsx" ]
+ecm_image_directories: [ "../dat/2018-10-04/region_1/C002",
+                         "../dat/2018-10-04/region_2/C002",
+                         "../dat/2018-10-04/region_3/C002",
+                         "../dat/2018-10-04/region_4/C002",
+                         "../dat/2018-10-04/region_5/C002",
+                         "../dat/2018-10-04/region_6/C002",
+                         "../dat/2018-10-04/region_7/C002",
+                         "../dat/2018-10-04/region_8/C002" ]
+cell_image_directories: [ "../dat/2018-10-04/region_1/C001",
+                          "../dat/2018-10-04/region_2/C001",
+                          "../dat/2018-10-04/region_3/C001",
+                          "../dat/2018-10-04/region_4/C001",
+                          "../dat/2018-10-04/region_5/C001",
+                          "../dat/2018-10-04/region_6/C001",
+                          "../dat/2018-10-04/region_7/C001",
+                          "../dat/2018-10-04/region_8/C001" ]
+output_directories: [ "results/2018-10-04/region_1",
+                      "results/2018-10-04/region_2",
+                      "results/2018-10-04/region_3",
+                      "results/2018-10-04/region_4",
+                      "results/2018-10-04/region_5",
+                      "results/2018-10-04/region_6",
+                      "results/2018-10-04/region_7",
+                      "results/2018-10-04/region_8" ]
+image_spacing: [ [ 0.159, 0.159, 1.0 ],
+                 [ 0.159, 0.159, 1.0 ],
+                 [ 0.159, 0.159, 1.0 ],
+                 [ 0.159, 0.159, 1.0 ],
+                 [ 0.159, 0.159, 1.0 ],
+                 [ 0.159, 0.159, 1.0 ],
+                 [ 0.159, 0.159, 1.0 ],
+                 [ 0.159, 0.159, 1.0 ] ]
+bilateral_domain_sigma: 0.5
+bilateral_range_sigma: 5.0
+equalization_window: [ 0.5, 0.5 ]
+exponent: 1.1
+surface_angles: [ -91.19,
+                  -92.84,
+                  -90.00,
+                  -90.00,
+                  -90.00,
+                  -90.00,
+                  -90.00,
+                  -90.00 ]

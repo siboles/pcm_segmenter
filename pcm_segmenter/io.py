@@ -10,7 +10,7 @@ def read_image_stack(directory: str, spacing: List[float]) -> pycell.FloatImage:
     return pycell.FloatImage(directory, spacing=spacing)
 
 
-def read_polydata(polydata: vtk.vtkPolyData, name: str, directory: str):
+def read_polydata(name: str, directory: str):
     reader = vtk.vtkXMLPolyDataReader()
     reader.SetFileName(pathlib.Path(directory).joinpath(name))
     reader.Update()
@@ -18,7 +18,7 @@ def read_polydata(polydata: vtk.vtkPolyData, name: str, directory: str):
 
 
 def read_dataframe_from_excel(name: str, directory: str):
-    dataframe = pandas.read_excel(pathlib.Path(directory).joinpath(name))
+    dataframe = pandas.read_excel(pathlib.Path(directory).joinpath(name), engine="openpyxl")
     return dataframe
 
 

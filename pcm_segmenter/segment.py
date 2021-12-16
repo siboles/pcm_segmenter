@@ -6,7 +6,7 @@ from . import config
 
 def process_ecm(image: pycell.FloatImage, conf: config.Config) -> pycell.FloatImage:
     image_filter = pycell.FilteringPipeline(inputImage=image)
-    image_filter.addFilter(pycell.Bilateral(domainSigma=conf.bilateral_range_sigma,
+    image_filter.addFilter(pycell.Bilateral(domainSigma=conf.bilateral_domain_sigma,
                                             rangeSigma=conf.bilateral_range_sigma))
     image_filter.addFilter(pycell.Equalize(window_fraction=conf.equalization_window))
     image_filter.execute()
