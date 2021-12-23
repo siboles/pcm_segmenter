@@ -7,16 +7,31 @@ Enveloping Chondrocytes." Annals of Biomedical Engineering. DOI: 10.1007/s10439-
 Installation
 ------------
 The Python package utilizes the conda package manager for dependency resolution. We recommend 
-installing the miniforge3 implementation of conda from https://conda-forge.org/miniforge/
+installing the miniforge3 implementation of conda from <https://conda-forge.org/miniforge/>
 
 After conda installation first add the siboles channel by executing:
+
 ```
 conda config --add channels siboles
 ```
-one can then create an isolated conda environment with all necessary dependencies with the command:
+
+If you did not install miniforge3, you may also need to add the conda-forge channel with:
+
+```
+conda config --add channels conda-forge
+```
+
+One can then create an isolated conda environment with all necessary dependencies with the command:
 
 ```
 conda create -n NAME_OF_ENVIRONMENT pycellanalyst pydantic pyyaml
+```
+
+where, NAME_OF_ENVIRONMENT, is the user's choice. To use the pcm_segmenter Python package
+the conda environment must be activated with:
+
+```
+conda activate NAME_OF_ENVIRONMENT
 ```
 
 Running
