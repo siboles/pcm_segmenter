@@ -5,6 +5,21 @@ import yaml
 
 
 class Config(BaseModel):
+    """
+    Defines configuration for segmentation and thickness analysis of PCM.
+    :param regions_of_interest: List of paths to excel files defining user-defined bounding boxes around chondrons
+    :param ecm_image_directories: List of paths to directories containing TIFF sequences for ECM channel
+    :param cell_image_directories: List of paths to directories containing TIFF sequences for Cell channel
+    :param output_directories: List of paths to store output of segmentation and analysis
+    :param image_spacing: List of [x, y, z] spacings for corresponding ECM and Cell image sequences
+    :param bilateral_domain_sigma: Variance of domain Gaussian for bilateral filter
+    :param bilateral_range_sigma: Variance of range Gaussian for bilateral filter
+    :param equalization_window: List of window dimensions (x, y) for adaptive contrast equalization
+    :param exponent: Exponent to raise ECM image region of interest to. This is to reduce background intensity.
+    :param diffusion_conductance: Diffusion coefficient for curvature-based anisotropic diffusion smoothing
+    :param diffusion_iterations: Iterations of diffusion smoothing
+    :param surface_angles: List of orientation angles of cartilage surface for each image sequence
+    """
     regions_of_interest: List[str]
     ecm_image_directories: List[str]
     cell_image_directories: List[str]
