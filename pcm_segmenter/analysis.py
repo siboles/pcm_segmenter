@@ -8,6 +8,9 @@ from . postprocess import create_pandas_dataframe_from_polydata, concatenate_pan
 
 
 def _label_cell_contours(cell_contour: vtk.vtkPolyData) -> vtk.vtkPolyDataConnectivityFilter:
+    """
+    Constructs a vtkPolyDataConnectivityFilter to separate and label non-connected contours
+    """
     connected_components = vtk.vtkPolyDataConnectivityFilter()
     connected_components.SetExtractionModeToAllRegions()
     connected_components.ScalarConnectivityOff()
@@ -18,6 +21,12 @@ def _label_cell_contours(cell_contour: vtk.vtkPolyData) -> vtk.vtkPolyDataConnec
 
 
 def _get_normals(polydata: vtk.vtkPolyData, flip: bool = False) -> vtk.vtkPolyData:
+    """
+    Calculate and store surface normals of vktPolyData
+    :param polydata:
+    :param flip:
+    :return:
+    """
     normals = vtk.vtkPolyDataNormals()
     normals.SetInputData(polydata)
     normals.SetFlipNormals(flip)
@@ -27,6 +36,13 @@ def _get_normals(polydata: vtk.vtkPolyData, flip: bool = False) -> vtk.vtkPolyDa
 
 
 def _extrude_contour(c: vtk.vtkPolyData, length: float, flip: bool = False) -> vtk.vtkPolyData:
+    """
+    Extrudes the contour to create a surface. This is necessary to calculate ray intersections.
+    :param c: vtkPolyData of 2D isocontour
+    :param length: distance to extrude
+    :param flip: whether to flip surface normals of extruded contour
+    :return:
+    """
     extrusion = vtk.vtkLinearExtrusionFilter()
     extrusion.SetExtrusionTypeToNormalExtrusion()
     extrusion.CappingOff()
@@ -46,6 +62,12 @@ def _extrude_contour(c: vtk.vtkPolyData, length: float, flip: bool = False) -> v
 
 
 def _convex_hull_2d(c: vtk.vtkPolyData, spacing: float) -> vtk.vtkPolyData:
+    """
+    Generate convex hull of 2D isocontour
+    :param c: vtkPolyData definition of 2D isocontour
+    :param spacing: spacing of spline points on convex hull
+    :return:
+    """
     convex_hull = vtk.vtkConvexHull2D()
     convex_hull.SetInputData(c)
     convex_hull.OutlineOn()
@@ -62,7 +84,9 @@ def _convex_hull_2d(c: vtk.vtkPolyData, spacing: float) -> vtk.vtkPolyData:
 
 def _create_extrusion_lists(isocontours: vtk.vtkPolyDataConnectivityFilter,
                             spacing: List[float]) -> Tuple[List[vtk.vtkPolyData], List[vtk.vtkPolyData]]:
-    """For each unique isocontour id create an extrusion of the original contour and its convex hull."""
+    """
+    For each unique isocontour id create an extrusion of the original contour and its convex hull.
+    """
     convex_hull_spline_spacing = np.min(spacing) / 2.0
     extrusion_length = np.mean(spacing)
     cell_extrusions = []
@@ -82,6 +106,14 @@ def _create_extrusion_lists(isocontours: vtk.vtkPolyDataConnectivityFilter,
 
 def _get_ray_intersection(tree: vtk.vtkOBBTree, origin: List[float],
                           direction: List[float], length: float) -> float:
+    """
+    Find the intersection point of a casted ray with surface OBB tree of surface.
+    :param tree: VTK oriented bounding box tree of surface for fast search of ray intersections
+    :param origin: origin coordinates of ray
+    :param direction: direction of ray
+    :param length: length to search for intersections along ray
+    :return:
+    """
     p2 = origin + direction * length
     points = vtk.vtkPoints()
     tree.IntersectWithLine(origin, p2, points, None)
@@ -125,6 +157,15 @@ def _initialize_int_array(number_of_tuples: int, number_of_components: int, name
 def _make_thickness_polydata(coordinates: vtk.vtkFloatArray, thicknesses: vtk.vtkFloatArray,
                              directions: vtk.vtkFloatArray, region_ids: vtk.vtkIntArray,
                              angular_directions: vtk.vtkFloatArray) -> vtk.vtkPolyData:
+    """
+    Create a vtkPolyData storing thicknesses, ray unit vectors, angular ray directions, and region IDs
+    :param coordinates: Points on isocontour
+    :param thicknesses: Calculated thicknesses
+    :param directions: Ray vectors
+    :param region_ids: Region ID (Top = 0, Side = 1, Bottom = 2)
+    :param angular_directions:
+    :return:
+    """
     points = vtk.vtkPoints()
     points.SetData(coordinates)
     polydata = vtk.vtkPolyData()
@@ -138,6 +179,16 @@ def _make_thickness_polydata(coordinates: vtk.vtkFloatArray, thicknesses: vtk.vt
 
 def calculate_thicknesses(cell_isocontour: vtk.vtkPolyData, ecm_isocontour: vtk.vtkPolyData,
                           spacing: List[float], surface_angle: float) -> List[vtk.vtkPolyData]:
+    """
+    Calculates the PCM thicknesses by ray casting along surface normals of the cell convex hulls.
+    Classifies the thickness vectors by region ID based on angle relative to cartilage surface.
+    The coordinate system for this classification is transformed by the provided surface angle.
+    :param cell_isocontour: vtkPolyData of 2D cell isocontour
+    :param ecm_isocontour: vtkPolyData of 2D ECM isocontour
+    :param spacing: image spacing in physical dimensions
+    :param surface_angle: Angle of cartilage surface in degrees.
+    :return:
+    """
     ecm_extrusion = _extrude_contour(ecm_isocontour, np.mean(spacing))
     cell_contours = _label_cell_contours(cell_isocontour)
     cell_extrusions, cell_convex_hulls = _create_extrusion_lists(cell_contours, spacing)
