@@ -6,8 +6,8 @@ Enveloping Chondrocytes." Annals of Biomedical Engineering. DOI: 10.1007/s10439-
 
 Installation
 ------------
-The Python package utilizes the conda package manager for dependency resolution. We recommend installing the miniforge3
-implementation of conda from https://conda-forge.org/miniforge/
+The Python package utilizes the conda package manager for dependency resolution. We recommend 
+installing the miniforge3 implementation of conda from https://conda-forge.org/miniforge/
 
 After conda installation first add the siboles channel by executing:
 ```
@@ -19,6 +19,8 @@ one can then create an isolated conda environment with all necessary dependencie
 conda create -n NAME_OF_ENVIRONMENT pycellanalyst pydantic pyyaml
 ```
 
+Running
+-------
 The study can then be reproduced by navigating to the scripts directory:
 
 ```
@@ -39,4 +41,5 @@ python manuscript_postprocess.py
 
 This will generate a results directory tree with the resulting VTK files for each specimen/region in
 appropriate sub-folders. At the root level of the results directory, Excel files containing the analysis results
-for each specimen will be created. 
+for each specimen will be created. Finally, after running manuscript_postprocess.py, 
+manuscript_analyses_aggregate.xlsx will be written with the measurements for all cells aggregated into a single file.
