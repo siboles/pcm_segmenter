@@ -34,6 +34,13 @@ the conda environment must be activated with:
 conda activate NAME_OF_ENVIRONMENT
 ```
 
+Optionally, the pcm_segmenter package can be installed for system-wide execution (with the conda environment
+activated) by running:
+
+```
+python setup.py install
+```
+
 Running
 -------
 The study can then be reproduced by navigating to the scripts directory:
