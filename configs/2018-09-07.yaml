@@ -37,10 +37,10 @@ bilateral_domain_sigma: 0.5
 bilateral_range_sigma: 5.0
 equalization_window: [ 0.5, 0.5 ]
 exponent: 1.1
-surface_angles: [ -90.00,
-                  -90.00,
-                  -90.00,
-                  -90.00,
+surface_angles: [ -90.47,
+                  -92.44,
+                  -90.6,
+                  -95.52,
                   -95.84,
                   -96.75,
                   -93.61 ]
