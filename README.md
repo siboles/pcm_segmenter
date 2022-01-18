@@ -43,6 +43,12 @@ python setup.py install
 
 Running
 -------
+The study dataset can be retrieved from:
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5874143.svg)](https://doi.org/10.5281/zenodo.5874143)
+
+Extract this to the top-level of this repository.
+
 The study can then be reproduced by navigating to the scripts directory:
 
 ```
