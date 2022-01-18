@@ -4,6 +4,9 @@ This archive contains the data and custom Python package to reproduce the image 
 analysis conducted for the publication "The Protective Function of Directed Asymmetry in the Pericellular Matrix 
 Enveloping Chondrocytes." Annals of Biomedical Engineering. DOI: 10.1007/s10439-021-02900-1.
 
+[![DOI](https://zenodo.org/badge/449380337.svg)](https://zenodo.org/badge/latestdoi/449380337)
+
+
 Installation
 ------------
 The Python package utilizes the conda package manager for dependency resolution. We recommend 
